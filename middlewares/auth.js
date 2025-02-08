@@ -46,29 +46,6 @@ const isAdm = (req, res, next) => {
     })
 }
 
-//Função que identifica se a permissão do usuário é ele mesmo ou se é um administrador
-const userIsAdmOrHimself = (req, res, next) => {
-    verifyToken(req, res, (err) => {
-
-        //Resgate das informações do body
-        const idUserToBeUpdated = req.body.id
-        const idUserMakingUpdate = req.user.id
-        const isAdm = req.user.isAdm
-
-        if(err) {
-            return res.status(401).json({message: 'Acesso negado'})
-        }
-
-        //Se o usuário não for administrador ou nem a mesma pessoa a sofrer as alterações, acionará erro 403
-        if(!isAdm && (idUserToBeUpdated !== idUserMakingUpdate)) {
-            return res.status(403).json({message: 'Acesso negado: apenas administradores podem realizar a ação'})
-        }
-
-        //Caso contrário, proseguirá para a próxima função
-        next();
-    })
-}
-
 //Função para caso não encontre a rota especificada
 const urlNotValid = (req, res, next) => {
     res.status(404).json({message: "Rota não existente"})
@@ -76,4 +53,4 @@ const urlNotValid = (req, res, next) => {
 
 
 
-module.exports = { verifyToken, isAdm, userIsAdmOrHimself, urlNotValid }
+module.exports = { verifyToken, isAdm, urlNotValid }

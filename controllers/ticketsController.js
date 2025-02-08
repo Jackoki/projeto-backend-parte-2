@@ -1,8 +1,8 @@
-const { countries, getNewId } = require('../data/databaseCountries')
-const Country = require('../models/Country')
+const { tickets, getNewId } = require('../data/databaseTickets')
+const Ticket = require('../models/Ticket')
 
 //Função para retornar todos os paises
-const getCountries = (req, res) => {
+const getTickets = (req, res) => {
     //Se a página não for informada, será iniciada na primeira página
     const { page = 1 } = req.query
 
@@ -11,11 +11,11 @@ const getCountries = (req, res) => {
      const limit = parseInt(req.query.limit, 10) || 5
 
      //Chamará a função de paginação a partir das requisições passadas
-     return paginate(countries, page, limit, res)
+     return paginate(tickets, page, limit, res)
 }
 
 //Função que retorna as informações do pais pelo nome passado no params
-const getCountryByName = (req, res) => {
+const getQuantity = (req, res) => {
     //Constante para receber o nome passado no params
     const countryName = req.params.name;
     
@@ -29,12 +29,12 @@ const getCountryByName = (req, res) => {
     }
 
     //Retorno caso tenha encontrado
-    res.status(200).json(country)
+    res.status(200).json(country)S
 }
 
 
 //Função que retornará paises pelo parametro do continente passado pelo params
-const getCountriesByContinent = (req, res) => {
+const getTypes = (req, res) => {
     
     //Caso a página não seja passada, o padrão começara na primeira página
     const { page = 1 } = req.query
@@ -60,70 +60,8 @@ const getCountriesByContinent = (req, res) => {
 }
 
 
-//Função que retornará paises pelo parametro da língua passada pelo params
-const getCountriesByLanguage = (req, res) => {
-    
-    //Caso a página não seja passada, o padrão começara na primeira página
-    const { page = 1 } = req.query
-
-     //Recebe o limite de valores a aparecer na página pela query, 
-     //Se não for enviado, cada página terá apenas 5 países
-    const limit = parseInt(req.query.limit, 10) || 5
-
-
-    //Recebe a língua pelo params
-    const languageName = req.params.language;
-
-     //Procurará no database os paises que contém a lingua passada
-    //Uso de lowercase para evitar problemas de case sensitive
-    const language = countries.filter(c => c.language.toLowerCase().trim() === languageName.toLowerCase().trim());
-
-
-    //Se não encontrar nenhum pais com a lingua passada, retornará erro 404
-    if (language.length === 0) {
-        return res.status(404).json({ message: "Língua não encontrada" });
-    }
-
-    //Chamará a função de paginação a partir das requisições filtradas
-    return paginate(language, page, limit, res)
-}
-
-
-
-//Função que retornará paises pelo parametro de true ou false de allowMultipleCitizenship pelo params
-const getCountriesByAMC = (req, res) => {
-
-    //Caso a página não seja passada, o padrão começara na primeira página
-    const { page = 1 } = req.query
-
-     //Recebe o limite de valores a aparecer na página pela query, 
-     //Se não for enviado, cada página terá apenas 5 países
-    const limit = parseInt(req.query.limit, 10) || 5
-    
-    
-    //Recebe a allowMultipleCitizenship pelo params
-    const countryAMCParam  = req.params.allowMultipleCitizenship;
-
-    //Como o parâmetro enviado é um booleano, fazemos uma conversão em que analisamos se é true ou false
-    //Se o parâmetro enviado for true, o countryAMC receberá true, se não for, receberá false
-    const countryAMC = (countryAMCParam === 'true');
-    
-
-    //Procurará no database os paises que contém o allowMultipleCitizenship
-    const AMC = countries.filter(c => c.allowMultipleCitizenship === countryAMC);
-
-    //Se não encontrar, retornará erro 404
-    if (AMC.length === 0) {
-        return res.status(404).json({ message: "País não encontrado" });
-    }
-
-    
-    //Chamará a função de paginação a partir das requisições filtradas
-    return paginate(AMC, page, limit, res)
-}
-
 //Função para cadastro de pais
-const registerCountry = (req, res) => {
+const registerTicket = (req, res) => {
     //Constante para receber o body da requisição
     const newCountry =  req.body
 
@@ -147,7 +85,7 @@ const registerCountry = (req, res) => {
 }
 
 //Função para atualizar informações de um pais pelo ID
-const updateCountry = (req, res) => {
+const updateTicket = (req, res) => {
     //Constante para receber o ID pela url
     const countryId = parseInt(req.params.id);
 
@@ -191,7 +129,7 @@ const updateCountry = (req, res) => {
     res.status(200).json(countryFound)
 }
 
-const deleteCountry = (req, res) => {
+const deleteTicket = (req, res) => {
     //Pegamos o ID do pais passado pela URL
     const countryId = parseInt(req.params.id, 10);
 
@@ -264,12 +202,10 @@ const paginate = (database, page, limit, res) => {
 }
 
 module.exports = {
-    getCountries,
-    getCountryByName,
-    getCountriesByContinent,
-    getCountriesByLanguage,
-    getCountriesByAMC,
-    registerCountry,
-    updateCountry,
-    deleteCountry
+    getTickets,
+    getQuantity,
+    getTypes,
+    registerTicket,
+    updateTicket,
+    deleteTicket
 }
