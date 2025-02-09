@@ -9,9 +9,9 @@ const router = express.Router()
 //Chamada de funções dos controllers das rotas criadas
 const ticketsController = require('../controllers/ticketsController.js')
 
-router.get('/tickets', verifyToken, ticketsController.getTickets)
-router.get('/quantity', verifyToken, ticketsController.getQuantity)
-router.get('/types', verifyToken, ticketsController.getTypes)
+router.get('/tickets', verifyToken, ticketsController.getTickets);
+router.get('/tickets/:name', verifyToken, ticketsController.getTicketByName);
+router.get('/tickets/price/:price', verifyToken, ticketsController.getTicketsByPrice);
 
 //Rota para registro de um ticket
 router.post('/registerTicket', verifyToken, isAdm, ticketsController.registerTicket)
