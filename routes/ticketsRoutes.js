@@ -10,7 +10,7 @@ const router = express.Router()
 const ticketsController = require('../controllers/ticketsController.js')
 
 router.get('/tickets', verifyToken, ticketsController.getTickets);
-router.get('/tickets/:name', verifyToken, ticketsController.getTicketByName);
+router.get('/tickets/types/:name', verifyToken, ticketsController.getTicketByName);
 router.get('/tickets/price/:price', verifyToken, ticketsController.getTicketsByPrice);
 
 //Rota para registro de um ticket

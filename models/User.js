@@ -1,30 +1,41 @@
-const User = function (id, name, email, user, password, isAdm) {
-    this.id = id
-    this.name = name
-    this.email = email
-    this.user = user
-    this.password = password
-    this.isAdm = isAdm
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../helpers/db');
 
-    this.getId = function() {
-        return this.id
+const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+            isEmail: true
+        }
+    },
+    username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    isAdm: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
+}, 
+{
+    tableName: 'users',
+    timestamps: true
+});
 
-    this.getName = function() {
-        return this.name
-    }
-
-    this.getEmail = function() {
-        return this.email
-    }
-
-    this.getUser = function() {
-        return this.user
-    }
-
-    this.getIsAdm = function() {
-        return this.isAdm
-    }
-}
-
-module.exports = User
+module.exports = User;

@@ -1,19 +1,24 @@
-const Ticket = function (id, name, price) {
-    this.id = id
-    this.name = name
-    this.price = price
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../helpers/db');
 
-    this.getId = function() {
-        return this.id
+const Ticket = sequelize.define('Ticket', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false
     }
+}, 
+{
+    tableName: 'tickets',
+    timestamps: true
+});
 
-    this.getName = function() {
-        return this.name
-    }
-
-    this.getPrice = function() {
-        return this.price
-    }
-}
-
-module.exports = Ticket
+module.exports = Ticket;

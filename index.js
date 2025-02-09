@@ -15,4 +15,4 @@ app.use('/tickets', ticketsRoutes)
 //Chamada de middleware do arquivo auth.js para caso não encontre a rota
 app.use(urlNotValid)
 
-app.listen(3000, () => console.log("Servidor rodando na porta 4000"))
+app.listen(4000, () => console.log("Servidor rodando na porta 4000"))

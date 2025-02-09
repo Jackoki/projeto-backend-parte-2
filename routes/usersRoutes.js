@@ -27,8 +27,7 @@ router.post('/login', usersControler.verifyUser)
 
 //Rotas put para modificar as informações do usuário, sendo que um para modificar o próprio usuário
 //outro apenas os administradores podem modificar.
-router.put('/updateUser', verifyToken, userIsAdmOrHimself, usersControler.updateUser)
-router.put('/updateAdm', verifyToken, isAdm, usersControler.updateUserAdm)
+router.put('/updateUser', verifyToken, usersControler.updateUser)
 
 //Rota delete que permite a deletar usuário pelo req.params caso o usuário autenticado seja administrador. 
 router.delete('/:id', verifyToken, isAdm, usersControler.deleteUser)
