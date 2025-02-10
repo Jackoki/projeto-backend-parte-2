@@ -1,18 +1,29 @@
-//Importação de frameworks e funções no projeto, uso de dotenv para o auth.
 require('dotenv').config();
-const express = require('express')
-const {urlNotValid} = require('./middlewares/auth.js')
-const usersRoutes = require('./routes/usersRoutes')
-const ticketsRoutes = require('./routes/ticketsRoutes')
-const app = express()
+const express = require('express');
+const { urlNotValid } = require('./middlewares/auth.js');
+const usersRoutes = require('./routes/usersRoutes');
+const ticketsRoutes = require('./routes/ticketsRoutes');
+const { sequelize } = require('./helpers/db');
 
-app.use(express.json())
+const app = express();
 
-//O servidor na porta 3000, tendo 3 rotas principais, /users, /tickets.
-app.use('/users', usersRoutes)
-app.use('/tickets', ticketsRoutes)
+app.use(express.json());
 
-//Chamada de middleware do arquivo auth.js para caso não encontre a rota
-app.use(urlNotValid)
+// Rotas principais
+app.use('/users', usersRoutes);
+app.use('/tickets', ticketsRoutes);
 
-app.listen(4000, () => console.log("Servidor rodando na porta 4000"))
+// Middleware para rota não encontrada
+app.use(urlNotValid);
+
+// Função assíncrona para criar as tabelas no MySQL caso elas não existam ao compilar o projeto
+(async () => {
+  try {
+    await sequelize.sync({ alter: true }); 
+    app.listen(4000, () => console.log("Servidor rodando na porta 4000"));
+  } 
+  
+  catch (error) {
+    console.error("Erro ao sincronizar o banco de dados:", error);
+  }
+})();
