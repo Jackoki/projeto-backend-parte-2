@@ -15,7 +15,6 @@ router.get('/install', usersControler.installSystem)
 
 //Rotas get, um para retornar todos os usuários do sistema e outro para retornar um especifico pelo id no req.params
 router.get('/', usersControler.getUsers)
-router.get('/:id', usersControler.getUserById)
 
 
 

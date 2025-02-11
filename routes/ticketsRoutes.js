@@ -15,6 +15,7 @@ router.get('/price/:price', verifyToken, ticketsController.getTicketsByPrice);
 
 //Rota para registro de um ticket
 router.post('/registerTicket', verifyToken, isAdm, ticketsController.registerTicket)
+router.post('/buyTicket', verifyToken, ticketsController.buyTicket)
 
 //Rota para atualizar informações de um ticket
 router.put('/updateTicket', verifyToken, isAdm, ticketsController.updateTicket)

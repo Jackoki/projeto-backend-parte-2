@@ -20,7 +20,9 @@ const getTickets = async (req, res) => {
             lastPage: lastPage,
             totalItems: count,
         });
-    } catch (error) {
+    } 
+    
+    catch (error) {
         res.status(500).json({ message: 'Erro ao recuperar os tickets' });
     }
 };
@@ -39,7 +41,9 @@ const getTicketByName = async (req, res) => {
         }
 
         res.status(200).json(ticket);
-    } catch (error) {
+    } 
+    
+    catch (error) {
         res.status(500).json({ message: 'Erro ao buscar o ticket' });
     }
 };
@@ -73,7 +77,9 @@ const getTicketsByPrice = async (req, res) => {
             lastPage: lastPage,
             totalItems: count,
         });
-    } catch (error) {
+    } 
+    
+    catch (error) {
         res.status(500).json({ message: 'Erro ao buscar tickets' });
     }
 };
@@ -95,10 +101,16 @@ const registerTicket = async (req, res) => {
         });
 
         res.status(200).json(newTicket);
-    } catch (error) {
+    } 
+    
+    catch (error) {
         res.status(500).json({ message: 'Erro ao criar o ticket' });
     }
 };
+
+const buyTicket = async (req, res) => {
+
+}
 
 // Função para atualizar informações de um ticket
 const updateTicket = async (req, res) => {
@@ -121,7 +133,9 @@ const updateTicket = async (req, res) => {
         await ticket.save();
 
         res.status(200).json(ticket);
-    } catch (error) {
+    } 
+    
+    catch (error) {
         res.status(500).json({ message: 'Erro ao atualizar o ticket' });
     }
 };
@@ -140,7 +154,9 @@ const deleteTicket = async (req, res) => {
         await ticket.destroy();
 
         res.status(200).json(ticket);
-    } catch (error) {
+    } 
+    
+    catch (error) {
         res.status(500).json({ message: 'Erro ao deletar o ticket' });
     }
 };
@@ -149,6 +165,7 @@ module.exports = {
     getTickets,
     getTicketByName,
     getTicketsByPrice,
+    buyTicket,
     registerTicket,
     updateTicket,
     deleteTicket

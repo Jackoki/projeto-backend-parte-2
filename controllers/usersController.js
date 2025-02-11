@@ -17,26 +17,6 @@ const getUsers = async (req, res) => {
 
 
 
-//Função que retorna as informações do usuário pelo ID passado no req.params
-const getUserById = async (req, res) => {
-    try {
-        const user = await User.findOne({
-            where: { id: req.params.id }  // Busca usuário pelo ID
-        });
-
-        if (!user) {
-            return res.status(404).json({ message: "Usuário não encontrado" });
-        }
-
-        res.status(200).json(user);
-    } 
-    
-    catch (error) {
-        res.status(500).json({ message: "Erro ao buscar usuário", error });
-    }
-};
-
-
 const installSystem = async (req, res) => {
     try {
         // Verificar se o administrador já existe
@@ -218,7 +198,6 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
     getUsers,
-    getUserById,
     installSystem,
     createUser,
     createUserAdm,
