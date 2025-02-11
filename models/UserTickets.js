@@ -27,7 +27,7 @@ const UserTicket = sequelize.define('UserTicket', {
 }, 
 {
     tableName: 'user_tickets',
-    timestamps: true
+    timestamps: false
 });
 
 UserTicket.belongsTo(User, { foreignKey: 'userId' });

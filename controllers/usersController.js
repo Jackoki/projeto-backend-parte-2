@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+const Ticket = require('../models/Ticket')
+const TicketStock = require('../models/TicketStock')
 
 //Função que retorna todos os usuários salvos no vetor users do database
 const getUsers = async (req, res) => {
@@ -35,10 +37,11 @@ const getUserById = async (req, res) => {
 };
 
 
-const createInitialAdm = async (req, res) => {
+const installSystem = async (req, res) => {
     try {
+        // Verificar se o administrador já existe
         const existingAdmin = await User.findOne({
-            where: { isAdm: true, username: "Administrator" }
+            where: { isAdm: true, email: "adm@gmail.com" }
         });
 
         if (existingAdmin) {
@@ -53,13 +56,36 @@ const createInitialAdm = async (req, res) => {
             isAdm: true
         });
 
-        res.status(200).json(initialAdm);
+        const tickets = [
+            { id: 1, name: 'Meia', price: 30.00 },
+            { id: 2, name: 'Inteira', price: 60.00 },
+            { id: 3, name: 'V.I.P', price: 90.00 }
+        ];
+
+        const createdTickets = await Ticket.bulkCreate(tickets, { ignoreDuplicates: true });
+
+        const ticketStockData = [
+            { ticketId: 1, quantity: 20 },
+            { ticketId: 2, quantity: 20 },
+            { ticketId: 3, quantity: 10 }
+        ];
+
+        await TicketStock.bulkCreate(ticketStockData);
+
+        res.status(200).json({
+            message: "Sistema instalado com sucesso.",
+            administrator: initialAdm,
+            tickets: createdTickets,
+            ticketStock: ticketStockData
+        });
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao criar administrador", error });
+        res.status(500).json({ message: "Erro ao realizar a instalação do sistema", error });
     }
 };
+
+
 
 
 
@@ -193,7 +219,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     getUsers,
     getUserById,
-    createInitialAdm,
+    installSystem,
     createUser,
     createUserAdm,
     verifyUser,

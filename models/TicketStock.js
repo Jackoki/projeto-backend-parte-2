@@ -4,11 +4,6 @@ const User = require('./User');
 const Ticket = require('./Ticket');
 
 const TicketStock = sequelize.define('TicketStock', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
     quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -17,10 +12,9 @@ const TicketStock = sequelize.define('TicketStock', {
 }, 
 {
     tableName: 'ticket_stock',
-    timestamps: true
+    timestamps: false
 });
 
-TicketStock.belongsTo(User, { foreignKey: 'userId' });
-TicketStock.belongsTo(Ticket, { foreignKey: 'ticketId' });
+TicketStock.belongsTo(Ticket, { foreignKey: 'ticketId', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
 
 module.exports = TicketStock;

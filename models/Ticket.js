@@ -18,7 +18,7 @@ const Ticket = sequelize.define('Ticket', {
 }, 
 {
     tableName: 'tickets',
-    timestamps: true
+    timestamps: false
 });
 
 module.exports = Ticket;
