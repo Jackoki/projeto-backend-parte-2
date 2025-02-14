@@ -84,6 +84,37 @@ const getTicketsByPrice = async (req, res) => {
     }
 };
 
+const getUserTickets = async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'ID do usuário não fornecido.' });
+    }
+
+    try {
+        const userTickets = await UserTicket.findAll({
+            where: { userId },
+            include: [
+                {
+                    model: Ticket,
+                    attributes: ['id', 'name', 'price'],
+                }
+            ],
+            attributes: ['id', 'quantity', 'purchaseDate', 'status'],
+        });
+
+        if (userTickets.length === 0) {
+            return res.status(404).json({ message: 'Nenhum ingresso encontrado para este usuário.' });
+        }
+
+        return res.status(200).json(userTickets);
+    } 
+    
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 // Função para registrar um novo ticket
 const registerTicket = async (req, res) => {
     const { name, price, type, description } = req.body;
@@ -109,8 +140,55 @@ const registerTicket = async (req, res) => {
 };
 
 const buyTicket = async (req, res) => {
+    const { userId, tickets } = req.body;
+    
+    // Validações iniciais
+    if (!userId || !tickets || tickets.length === 0) {
+        return res.status(400).json({ message: 'Usuário ou ingressos não informados corretamente.' });
+    }
 
-}
+    const transaction = await sequelize.transaction();
+
+    try {
+        for (const ticket of tickets) {
+            const { ticketId, quantity } = ticket;
+
+            // Verifica a quantidade no estoque
+            const stock = await TicketStock.findOne({
+                where: { ticketId },
+                transaction,
+            });
+
+            if (!stock || stock.quantity < quantity) {
+                throw new Error(`Estoque insuficiente para o ingresso ID ${ticketId}.`);
+            }
+
+            // Atualiza o estoque
+            stock.quantity -= quantity;
+            await stock.save({ transaction });
+
+            // Registra a compra
+            await UserTicket.create({
+                userId,
+                ticketId,
+                quantity,
+                status: 'completed',
+                purchaseDate: new Date(),
+            }, { transaction });
+        }
+
+        // Confirma a transação
+        await transaction.commit();
+        return res.status(200).json({ message: 'Ingressos comprados com sucesso!' });
+
+    } 
+    
+    catch (error) {
+        // Reverte a transação em caso de erro
+        await transaction.rollback();
+        return res.status(500).json({ message: error.message });
+    }
+};
 
 // Função para atualizar informações de um ticket
 const updateTicket = async (req, res) => {
@@ -164,6 +242,7 @@ const deleteTicket = async (req, res) => {
 module.exports = {
     getTickets,
     getTicketByName,
+    getUserTickets,
     getTicketsByPrice,
     buyTicket,
     registerTicket,

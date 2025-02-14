@@ -10,6 +10,7 @@ const router = express.Router()
 const ticketsController = require('../controllers/ticketsController.js')
 
 router.get('', verifyToken, ticketsController.getTickets);
+router.get('/myTickets', verifyToken, ticketsController.getUserTickets);
 router.get('/types/:name', verifyToken, ticketsController.getTicketByName);
 router.get('/price/:price', verifyToken, ticketsController.getTicketsByPrice);
 
