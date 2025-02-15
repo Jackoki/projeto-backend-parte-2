@@ -5,6 +5,7 @@ const usersRoutes = require('./routes/usersRoutes');
 const ticketsRoutes = require('./routes/ticketsRoutes');
 const mustacheExpress = require("mustache-express");
 const { sequelize } = require('./helpers/db');
+const path = require('path');
 
 const app = express();
 
@@ -15,6 +16,12 @@ const engine = mustacheExpress()
 // Rotas principais
 app.use('/users', usersRoutes);
 app.use('/tickets', ticketsRoutes);
+
+
+app.get('/', (req, res) => {
+  res.render('home', { titulo: "Bem-vindo!" });
+});
+
 
 // Middleware para rota não encontrada
 app.use(urlNotValid);

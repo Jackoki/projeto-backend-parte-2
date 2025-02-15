@@ -15,8 +15,6 @@ const getUsers = async (req, res) => {
     }
 };
 
-
-
 const installSystem = async (req, res) => {
     try {
         // Verificar se o administrador já existe
@@ -58,16 +56,13 @@ const installSystem = async (req, res) => {
             tickets: createdTickets,
             ticketStock: ticketStockData
         });
+
     } 
     
     catch (error) {
         res.status(500).json({ message: "Erro ao realizar a instalação do sistema", error });
     }
 };
-
-
-
-
 
 //Função para criar usuário
 const createUser = async (req, res) => {
@@ -121,7 +116,6 @@ const createUserAdm = async (req, res) => {
     }
 };
 
-
 //Função de login que retorna um token
 const verifyUser = async (req, res) => {
     const { username, password } = req.body;
@@ -146,8 +140,6 @@ const verifyUser = async (req, res) => {
     }
 };
 
-
-
 //Função de atualizar informações do usuário
 const updateUser = async (req, res) => {
     const { id, name, email, username, password } = req.body;
@@ -168,8 +160,6 @@ const updateUser = async (req, res) => {
         res.status(500).json({ message: "Erro ao atualizar usuário", error });
     }
 };
-
-
 
 const deleteUser = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -194,7 +184,6 @@ const deleteUser = async (req, res) => {
         res.status(500).json({ message: "Erro ao deletar usuário", error });
     }
 };
-
 
 module.exports = {
     getUsers,

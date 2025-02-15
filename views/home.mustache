@@ -1,0 +1,17 @@
+<html>
+<head>
+    <title>Página Inicial - {{titulo}}</title>
+    <link rel="stylesheet" type="text/css" href="../public/stylesheets/styles-login.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{titulo}}</h1>
+        <form action="/login" method="POST">
+            <input type="text" name="username" placeholder="Usuário" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <button type="submit">Login</button>
+        </form>
+        <a class="link" href="/register">Registrar-se</a>
+    </div>
+</body>
+</html>
