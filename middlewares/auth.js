@@ -53,7 +53,7 @@ const isAdm = (req, res, next) => {
 
 //Função para caso não encontre a rota especificada
 const urlNotValid = (req, res, next) => {
-    res.status(404).json({message: "Rota não existente"})
+    res.status(404).render('routeNotFounded');
 }
 
 
