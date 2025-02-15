@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const path = require('path');
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const { urlNotValid } = require('./middlewares/auth.js');
 const { sequelize } = require('./helpers/db');
@@ -18,10 +19,16 @@ const engine = mustacheExpress()
 const app = express();
 app.use(express.json());
 
+// Middleware para passar informações do navegador para o back-end
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 // Rotas principais
 app.use('/users', usersRoutes);
 app.use('/tickets', ticketsRoutes);
 app.use('/', renderRoutes)
+
+
 
 // Middleware para rota não encontrada
 app.use(urlNotValid);

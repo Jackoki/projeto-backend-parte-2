@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 const Ticket = require('../models/Ticket')
@@ -51,12 +52,7 @@ const installSystem = async (req, res) => {
 
         await TicketStock.bulkCreate(ticketStockData);
 
-        res.status(200).json({
-            message: "Sistema instalado com sucesso.",
-            administrator: initialAdm,
-            tickets: createdTickets,
-            ticketStock: ticketStockData
-        });
+        res.render('success', { message: "Instalação feita com sucesso!", route: "/" });
 
     } 
     
@@ -70,10 +66,25 @@ const createUser = async (req, res) => {
     const { name, email, username, password, isAdm } = req.body;
 
     if (!name || !email || !username || !password) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+        res.render('error', { erro: "Todos os campos devem serem preenchidos!" });
     }
 
     try {
+        //Realiza a verificação se existe um usuário existente ou não no banco de dados
+        //Nesse caso ele utiliza a operação OR no banco de dados para ver se email ou username já existem
+        const existingUser = await User.findOne({
+            where: {
+                [Op.or]: [
+                    { email: email },
+                    { username: username }
+                ]
+            }
+        });
+
+        if (existingUser) {
+            return res.render('error', { erro: "Email ou Username já existentes!" });
+        }
+
         const userCreated = await User.create({
             name,
             email,
@@ -82,13 +93,15 @@ const createUser = async (req, res) => {
             isAdm
         });
 
-        res.status(201).json(userCreated);
+        res.render('home', { titulo: "Bem-vindo!" });
     } 
     
     catch (error) {
+        console.log(error);
         res.render('error', { erro: "Erro ao criar usuário!" });
     }
 };
+
 
 //Função de login que retorna um token
 const verifyUser = async (req, res) => {

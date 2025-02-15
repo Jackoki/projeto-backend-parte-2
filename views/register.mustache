@@ -1,13 +1,13 @@
 <html>
 <head>
-    <title>Página Inicial - {{titulo}}</title>
+    <title>Registrar-se</title>
     <link rel="stylesheet" type="text/css" href="../public/stylesheets/styles-login.css">
 </head>
 <body>
     <div class="container">
-        <h1>{{titulo}}</h1>
+        <h1>Registrar</h1>
 
-        <form action="/users/registerUser" method="POST">
+        <form action="users/registerUser" method="POST">
             <input type="text" name="name" placeholder="Nome" required>
             <input type="text" name="email" placeholder="Email" required>
             <input type="text" name="username" placeholder="Usuário" required>
@@ -15,11 +15,11 @@
         
             <div class="radio-group">
                 <label>
-                    <input type="radio" name="isAdmin" value="true" required>
+                    <input type="radio" name="isAdm" value="true" required checked>
                     Administrador
                 </label>
                 <label>
-                    <input type="radio" name="isAdmin" value="false" required>
+                    <input type="radio" name="isAdm" value="false" required>
                     Usuário Comum
                 </label>
             </div>
