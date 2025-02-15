@@ -11,7 +11,7 @@ const getUsers = async (req, res) => {
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao buscar usuários", error });
+        res.render('error', { erro: "Erro ao buscar usuários!" });
     }
 };
 
@@ -60,7 +60,7 @@ const installSystem = async (req, res) => {
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao realizar a instalação do sistema", error });
+        res.render('error', { erro: "Erro ao realizar a instalação do sistema!" });
     }
 };
 
@@ -85,7 +85,7 @@ const createUser = async (req, res) => {
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao criar usuário", error });
+        res.render('error', { erro: "Erro ao criar usuário!" });
     }
 };
 
@@ -112,7 +112,7 @@ const createUserAdm = async (req, res) => {
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao criar administrador", error });
+        res.render('error', { erro: "Erro ao criar administrador!" });
     }
 };
 
@@ -136,7 +136,7 @@ const verifyUser = async (req, res) => {
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao fazer login", error });
+        res.render('error', { erro: "Erro ao fazer login!" });
     }
 };
 
@@ -157,7 +157,7 @@ const updateUser = async (req, res) => {
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao atualizar usuário", error });
+        res.render('error', { erro: "Erro ao atualizar usuário!" });
     }
 };
 
@@ -181,7 +181,7 @@ const deleteUser = async (req, res) => {
     } 
     
     catch (error) {
-        res.status(500).json({ message: "Erro ao deletar usuário", error });
+        res.render('error', { erro: "Erro ao deletar usuário!" });
     }
 };
 
