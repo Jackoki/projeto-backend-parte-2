@@ -6,7 +6,7 @@ const TicketStock = require('../models/TicketStock')
 //Função que retorna todos os usuários salvos no vetor users do database
 const getUsers = async (req, res) => {
     try {
-        const users = await User.findAll();  // Busca todos os usuários no banco
+        const users = await User.findAll();
         res.status(200).json(users);
     } 
     
@@ -15,6 +15,7 @@ const getUsers = async (req, res) => {
     }
 };
 
+//Função na tela inicial para o usuário instalar os dados padrão ao clicar no botão
 const installSystem = async (req, res) => {
     try {
         // Verificar se o administrador já existe
@@ -23,7 +24,7 @@ const installSystem = async (req, res) => {
         });
 
         if (existingAdmin) {
-            return res.status(400).json({ message: 'Já existe o usuário Administrator no sistema.' });
+            return res.render('error', { erro: "O sistema já tem o usuário Administrator!" });
         }
 
         const initialAdm = await User.create({
@@ -66,7 +67,7 @@ const installSystem = async (req, res) => {
 
 //Função para criar usuário
 const createUser = async (req, res) => {
-    const { name, email, username, password } = req.body;
+    const { name, email, username, password, isAdm } = req.body;
 
     if (!name || !email || !username || !password) {
         return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
@@ -78,7 +79,7 @@ const createUser = async (req, res) => {
             email,
             username,
             password,
-            isAdm: false
+            isAdm
         });
 
         res.status(201).json(userCreated);
@@ -86,33 +87,6 @@ const createUser = async (req, res) => {
     
     catch (error) {
         res.render('error', { erro: "Erro ao criar usuário!" });
-    }
-};
-
-
-
-//Função para criar administrador
-const createUserAdm = async (req, res) => {
-    const { name, email, username, password } = req.body;
-
-    if (!name || !email || !username || !password) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
-    }
-
-    try {
-        const userCreated = await User.create({
-            name,
-            email,
-            username,
-            password,
-            isAdm: true
-        });
-
-        res.status(201).json(userCreated);
-    } 
-    
-    catch (error) {
-        res.render('error', { erro: "Erro ao criar administrador!" });
     }
 };
 
@@ -189,7 +163,6 @@ module.exports = {
     getUsers,
     installSystem,
     createUser,
-    createUserAdm,
     verifyUser,
     updateUser,
     deleteUser

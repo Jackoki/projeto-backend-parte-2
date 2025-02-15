@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>Página Inicial - {{titulo}}</title>
+    <link rel="stylesheet" type="text/css" href="../public/stylesheets/styles-login.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{titulo}}</h1>
+
+        <form action="/users/registerUser" method="POST">
+            <input type="text" name="name" placeholder="Nome" required>
+            <input type="text" name="email" placeholder="Email" required>
+            <input type="text" name="username" placeholder="Usuário" required>
+            <input type="password" name="password" placeholder="Senha" required>
+        
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="isAdmin" value="true" required>
+                    Administrador
+                </label>
+                <label>
+                    <input type="radio" name="isAdmin" value="false" required>
+                    Usuário Comum
+                </label>
+            </div>
+
+            <button type="submit">Registrar</button>
+        </form>
+
+        <a class="link" href="/">Voltar</a>
+    </div>
+</body>
+</html>

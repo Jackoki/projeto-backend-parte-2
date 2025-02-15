@@ -6,11 +6,17 @@
 <body>
     <div class="container">
         <h1>{{titulo}}</h1>
-        <form action="/login" method="POST">
+        <form action="users/login" method="POST">
             <input type="text" name="username" placeholder="Usuário" required>
             <input type="password" name="password" placeholder="Senha" required>
             <button type="submit">Login</button>
         </form>
+
+        <h2>Instalar Dados Default</h2>
+        <form action="users/install" method="GET">
+            <button type="submit">Instalar</button>
+        </form>
+
         <a class="link" href="/register">Registrar-se</a>
     </div>
 </body>

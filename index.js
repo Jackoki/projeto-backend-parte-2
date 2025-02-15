@@ -9,6 +9,7 @@ const { sequelize } = require('./helpers/db');
 //Importação das rotas
 const usersRoutes = require('./routes/usersRoutes');
 const ticketsRoutes = require('./routes/ticketsRoutes');
+const renderRoutes = require('./routes/renderRoutes');
 
 //Importação do Mustache
 const mustacheExpress = require("mustache-express");
@@ -20,16 +21,12 @@ app.use(express.json());
 // Rotas principais
 app.use('/users', usersRoutes);
 app.use('/tickets', ticketsRoutes);
-
-//Criação da rota sem nada para renderizar o arquivo Home.mustache para o usuário realizar o login
-app.get('/', (req, res) => {
-  res.render('home', { titulo: "Bem-vindo!" });
-});
+app.use('/', renderRoutes)
 
 // Middleware para rota não encontrada
 app.use(urlNotValid);
 
-//Variáveis para rodar o mustache
+//Variáveis para compilar o mustache
 app.engine("mustache", engine);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "mustache");

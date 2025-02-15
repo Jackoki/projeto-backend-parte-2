@@ -55,7 +55,7 @@ const getTicketsByPrice = async (req, res) => {
     const ticketPrice = parseFloat(req.params.price);
 
     if (isNaN(ticketPrice)) {
-        res.render('error', { erro: "Preço inválido!" });
+        return res.render('error', { erro: "Preço inválido!" });
     }
 
     try {
@@ -68,7 +68,7 @@ const getTicketsByPrice = async (req, res) => {
         const lastPage = Math.ceil(count / limit);
 
         if (rows.length === 0) {
-            res.render('error', { erro: "Nenhum ticket encontrado para o preço especificado!" });
+            return res.render('error', { erro: "Nenhum ticket encontrado para o preço especificado!" });
         }
 
         res.status(200).json({
@@ -88,7 +88,7 @@ const getUserTickets = async (req, res) => {
     const { userId } = req.params;
 
     if (!userId) {
-        res.render('error', { erro: "Usuário não encontrado!" });
+        return res.render('error', { erro: "Usuário não encontrado!" });
     }
 
     try {
@@ -104,7 +104,7 @@ const getUserTickets = async (req, res) => {
         });
 
         if (userTickets.length === 0) {
-            res.render('error', { erro: "Nenhum ingresso encontrado para este usuário!" });
+            return res.render('error', { erro: "Nenhum ingresso encontrado para este usuário!" });
         }
 
         return res.status(200).json(userTickets);
@@ -120,7 +120,7 @@ const registerTicket = async (req, res) => {
     const { name, price, type, description } = req.body;
 
     if (!name || !type || typeof price !== 'number' || !description) {
-        res.render('error', { erro: "Todos os campos são obrigatórios ou os tipos de parâmetros estão incorretos!" });
+        return res.render('error', { erro: "Todos os campos são obrigatórios ou os tipos de parâmetros estão incorretos!" });
     }
 
     try {
@@ -144,7 +144,7 @@ const buyTicket = async (req, res) => {
     
     // Validações iniciais
     if (!userId || !tickets || tickets.length === 0) {
-        res.render('error', { erro: "Usuário ou ingressos informados incorretamente!" });
+        return res.render('error', { erro: "Usuário ou ingressos informados incorretamente!" });
     }
 
     const transaction = await sequelize.transaction();
@@ -198,7 +198,7 @@ const updateTicket = async (req, res) => {
         const ticket = await Ticket.findByPk(ticketId);
 
         if (!ticket) {
-            res.render('error', { erro: "Ticket não encontrado!" });
+            return res.render('error', { erro: "Ticket não encontrado!" });
         }
 
         const { name, type, price, description } = req.body;
@@ -226,7 +226,7 @@ const deleteTicket = async (req, res) => {
         const ticket = await Ticket.findByPk(ticketId);
 
         if (!ticket) {
-            res.render('error', { erro: "Ticket não encontrado!" });
+            return res.render('error', { erro: "Ticket não encontrado!" });
         }
 
         await ticket.destroy();

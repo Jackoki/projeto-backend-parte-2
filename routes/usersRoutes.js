@@ -16,17 +16,12 @@ router.get('/install', usersControler.installSystem)
 //Rotas get, um para retornar todos os usuários do sistema e outro para retornar um especifico pelo id no req.params
 router.get('/', usersControler.getUsers)
 
-
-
-//Rotas post, um para registrar usuário, outro para registrar administrador (apenas administradores podem realizar) 
-//e outro de login que retorna o token
+//Rotas post, um para registrar usuário e outro de login que retorna o token
 router.post('/registerUser', usersControler.createUser)
-router.post('/registerAdm', verifyToken, isAdm, usersControler.createUserAdm)
 router.post('/login', usersControler.verifyUser)
 
-//Rotas put para modificar as informações do usuário, sendo que um para modificar o próprio usuário
-//outro apenas os administradores podem modificar.
-router.put('/updateUser', verifyToken, usersControler.updateUser)
+//Rotas put para modificar as informações do usuário, apenas os administradores podem modificar.
+router.put('/updateUser', verifyToken, isAdm, usersControler.updateUser)
 
 //Rota delete que permite a deletar usuário pelo req.params caso o usuário autenticado seja administrador. 
 router.delete('/:id', verifyToken, isAdm, usersControler.deleteUser)
