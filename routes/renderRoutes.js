@@ -17,6 +17,16 @@ router.get('/main-page-user', verifyToken, (req, res) => {
     res.render('mainPageUser');
 });
 
+// Rota para o formulário do procurar o nome do ticket
+router.get('/search-tickets-name', verifyToken, (req, res) => {
+    res.render('searchTicketsName');
+});
+
+// Rota para o formulário do procurar o preço do ticket
+router.get('/search-tickets-price', verifyToken, (req, res) => {
+    res.render('searchTicketsPrice');
+});
+
 
 
 

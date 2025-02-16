@@ -27,21 +27,28 @@ const getTickets = async (req, res) => {
 };
 
 
-
 // Função que retorna informações de um ticket pelo nome
 const getTicketByName = async (req, res) => {
-    const ticketName = req.params.name;
+    const { ticketName } = req.query;
 
     try {
-        const ticket = await Ticket.findOne({
-            where: { name: ticketName },
-        });
+        const ticketData = await sequelize.query(
+            `SELECT t.name, t.price, ts.quantity 
+            FROM tickets t
+            LEFT JOIN ticket_stock ts ON t.id = ts.ticketId
+            WHERE UPPER(t.name) LIKE UPPER(:ticketName)`, 
+            {
+                replacements: { ticketName: `%${ticketName}%`},
+                type: sequelize.QueryTypes.SELECT
+            }
+        );
 
-        if (!ticket) {
-            return res.status(404).json({ message: "Ticket não encontrado" });
+        if (ticketData.length === 0) {
+            return res.render('error', { erro: "Ticket não encontrado!" });
         }
 
-        res.status(200).json(ticket);
+        const ticket = ticketData[0];
+        res.render('ticketSearch', { items: [ticket]});
     } 
     
     catch (error) {
@@ -49,34 +56,34 @@ const getTicketByName = async (req, res) => {
     }
 };
 
+
 // Função que retorna tickets pelo preço
 const getTicketsByPrice = async (req, res) => {
-    const { page = 1 } = req.query;
-    const limit = parseInt(req.query.limit, 10) || 5;
-    const ticketPrice = parseFloat(req.params.price);
+    const { ticketPrice } = req.query;
 
     if (isNaN(ticketPrice)) {
         return res.render('error', { erro: "Preço inválido!" });
     }
 
     try {
-        const { count, rows } = await Ticket.findAndCountAll({
-            where: { price: ticketPrice },
-            limit: limit,
-            offset: (page - 1) * limit,
-        });
+        const ticketsData = await sequelize.query(
+            `SELECT t.name, t.price, ts.quantity 
+            FROM tickets t
+            LEFT JOIN ticket_stock ts ON t.id = ts.ticketId
+            WHERE t.price <= :ticketPrice`, 
+            {
+                replacements: { ticketPrice },
+                type: sequelize.QueryTypes.SELECT
+            }
+        );
 
-        const lastPage = Math.ceil(count / limit);
-
-        if (rows.length === 0) {
+        if (ticketsData.length === 0) {
             return res.render('error', { erro: "Nenhum ticket encontrado para o preço especificado!" });
         }
 
-        res.status(200).json({
-            items: rows,
-            currentPage: page,
-            lastPage: lastPage,
-            totalItems: count,
+        res.render('ticketSearch', { 
+            items: ticketsData,
+            totalItems: ticketsData.length 
         });
     } 
     
@@ -84,6 +91,7 @@ const getTicketsByPrice = async (req, res) => {
         res.render('error', { erro: "Erro ao buscar tickets!" });
     }
 };
+
 
 const getUserTickets = async (req, res) => {
     const userId = req.user.id;
@@ -119,39 +127,45 @@ const getUserTickets = async (req, res) => {
     }
 };
 
-
 // Função para registrar um novo ticket
 const registerTicket = async (req, res) => {
-    const { name, price, type, description } = req.body;
+    const { name, price, quantity } = req.body;
 
-    if (!name || !type || typeof price !== 'number' || !description) {
-        return res.render('error', { erro: "Todos os campos são obrigatórios ou os tipos de parâmetros estão incorretos!" });
+    if (!name || !price || !quantity) {
+        return res.render('error', { erro: "Todos os campos são obrigatórios!" });
+    }
+
+    if (isNaN(quantity) || quantity < 0) {
+        return res.render('error', { erro: "Quantidade inválida!" });
     }
 
     try {
         const newTicket = await Ticket.create({
             name,
             price,
-            type,
-            description
         });
 
-        res.status(200).json(newTicket);
+        const newTicketStock = await TicketStock.create({
+            ticketId: newTicket.id,
+            quantity,
+        });
+
+        res.status(200).json({
+            ticket: newTicket,
+            ticketStock: newTicketStock,
+        });
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao criar o ticket!" });
+        res.render('error', { erro: "Erro ao criar o ticket e o estoque!" });
     }
 };
+
 
 const buyTicket = async (req, res) => {
     const { tickets } = req.body;
     const userId = req.user.id;
-
-    // Debugging para entender a estrutura dos dados
-    console.log("Dados recebidos no servidor:", JSON.stringify(req.body, null, 2));
-
-    // Validações iniciais
+    
     if (!userId || !tickets || Object.keys(tickets).length === 0) {
         return res.render('error', { erro: "Usuário ou ingressos informados incorretamente!" });
     }
@@ -195,7 +209,7 @@ const buyTicket = async (req, res) => {
 
         // Confirma a transação
         await transaction.commit();
-        return res.render('success', { message: "Instalação feita com sucesso!", route: "/" });
+        return res.render('success', { message: "Compra feita com sucesso!", route: "/main-page-user" });
     } 
     
     catch (error) {
@@ -204,8 +218,6 @@ const buyTicket = async (req, res) => {
         res.render('error', { erro: "Erro ao realizar a compra!" });
     }
 };
-
-
 
 // Função para atualizar informações de um ticket
 const updateTicket = async (req, res) => {
@@ -218,14 +230,35 @@ const updateTicket = async (req, res) => {
             return res.render('error', { erro: "Ticket não encontrado!" });
         }
 
-        const { name, type, price, description } = req.body;
+        const { name, price, quantity } = req.body;
 
-        if (name) ticket.name = name;
-        if (type) ticket.type = type;
-        if (price) ticket.price = price;
-        if (description) ticket.description = description;
+        if (name){
+            ticket.name = name;
+        }
+
+        if (price){
+            ticket.price = price;
+        } 
 
         await ticket.save();
+
+        const ticketStock = await TicketStock.findOne({ where: { ticketId: ticketId } });
+
+        if (ticketStock) {
+            if (quantity !== undefined) {
+                ticketStock.quantity = quantity;
+                await ticketStock.save();
+            }
+        } 
+        
+        else {
+            if (quantity !== undefined) {
+                await TicketStock.create({
+                    ticketId: ticketId,
+                    quantity: quantity
+                });
+            }
+        }
 
         res.status(200).json(ticket);
     } 
@@ -234,6 +267,7 @@ const updateTicket = async (req, res) => {
         res.render('error', { erro: "Erro ao atualizar ticket!" });
     }
 };
+
 
 // Função para deletar um ticket
 const deleteTicket = async (req, res) => {

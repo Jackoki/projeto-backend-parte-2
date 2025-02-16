@@ -11,8 +11,8 @@ const ticketsController = require('../controllers/ticketsController.js')
 
 router.get('', verifyToken, ticketsController.getTickets);
 router.get('/myTickets', verifyToken, ticketsController.getUserTickets);
-router.get('/types/:name', verifyToken, ticketsController.getTicketByName);
-router.get('/price/:price', verifyToken, ticketsController.getTicketsByPrice);
+router.get('/types', verifyToken, ticketsController.getTicketByName);
+router.get('/price', verifyToken, ticketsController.getTicketsByPrice);
 
 //Rota para registro de um ticket
 router.post('/registerTicket', verifyToken, isAdm, ticketsController.registerTicket)
