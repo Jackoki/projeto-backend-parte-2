@@ -1,29 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tickets</title>
-</head>
-<body>
-    <h1>Tickets Disponíveis</h1>
-    <p>Total de Tickets: {{totalItems}}</p>
-
+<form action="tickets/buyTicket" method="POST">
     <table>
         <thead>
             <tr>
                 <th>Nome do Ticket</th>
+                <th>Preço</th>
                 <th>Quantidade</th>
+                <th>Selecionar</th>
             </tr>
         </thead>
         <tbody>
             {{#items}}
             <tr>
                 <td>{{name}}</td>
+                <td>{{price}}</td>
                 <td>{{quantity}}</td>
+                <td>
+                    <input type="hidden" name="tickets[{{id}}][id]" value="{{id}}" />
+                    <input 
+                        type="number" 
+                        name="tickets[{{id}}][quantity]" 
+                        min="0" 
+                        max="{{quantity}}" 
+                        placeholder="Quantidade" 
+                    />
+                </td>
             </tr>
             {{/items}}
         </tbody>
     </table>
-</body>
-</html>
+
+    <button type="submit">Comprar Tickets</button>
+</form>

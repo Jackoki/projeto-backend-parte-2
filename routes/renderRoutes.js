@@ -17,15 +17,6 @@ router.get('/main-page-user', verifyToken, (req, res) => {
     res.render('mainPageUser');
 });
 
-// Rota para a página principal como Usuário
-router.get('/main-page-admin', verifyToken, (req, res) => {
-    res.render('mainPageAdmin');
-});
-
-// Rota para a página principal como Usuário
-router.get('/my-tickets', verifyToken, (req, res) => {
-    res.render('buyTickets');
-});
 
 
 

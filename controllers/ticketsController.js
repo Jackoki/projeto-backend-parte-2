@@ -7,9 +7,9 @@ const { sequelize } = require('../helpers/db');
 const getTickets = async (req, res) => {
     try {
         const tickets = await sequelize.query(
-            `SELECT t.name, ts.quantity
+            `SELECT t.id, t.price, t.name, ts.quantity
             FROM db_backend_2.ticket_stock ts
-            INNER JOIN db_backend_2.tickets t ON t.id = ts.ticketId`,
+            INNER JOIN db_backend_2.tickets t ON (t.id = ts.ticketId)`,
 
             {
                 type: sequelize.QueryTypes.SELECT
@@ -86,35 +86,39 @@ const getTicketsByPrice = async (req, res) => {
 };
 
 const getUserTickets = async (req, res) => {
-    const { userId } = req.params;
+    const userId = req.user.id;
 
     if (!userId) {
         return res.render('error', { erro: "Usuário não encontrado!" });
     }
 
     try {
-        const userTickets = await UserTicket.findAll({
-            where: { userId },
-            include: [
-                {
-                    model: Ticket,
-                    attributes: ['id', 'name', 'price'],
-                }
-            ],
-            attributes: ['id', 'quantity', 'purchaseDate', 'status'],
-        });
+        const userTickets = await sequelize.query(
+            `SELECT t.name, t.price, SUM(ut.quantity) AS quantity
+            FROM db_backend_2.user_tickets ut
+            INNER JOIN db_backend_2.tickets t ON t.id = ut.ticketId
+            WHERE ut.userId = :userId
+            GROUP BY t.name, t.price
+            ORDER BY t.name;`,
+            {
+                replacements: { userId },
+                type: sequelize.QueryTypes.SELECT,
+            }
+        );
 
         if (userTickets.length === 0) {
             return res.render('error', { erro: "Nenhum ingresso encontrado para este usuário!" });
         }
 
-        return res.status(200).json(userTickets);
+        return res.render('myTickets', {items: userTickets, userTickets: userTickets.length});
     } 
     
     catch (error) {
+        console.error(error);
         res.render('error', { erro: "Erro ao buscar tickets!" });
     }
 };
+
 
 // Função para registrar um novo ticket
 const registerTicket = async (req, res) => {
@@ -141,27 +145,35 @@ const registerTicket = async (req, res) => {
 };
 
 const buyTicket = async (req, res) => {
-    const { userId, tickets } = req.body;
-    
+    const { tickets } = req.body;
+    const userId = req.user.id;
+
+    // Debugging para entender a estrutura dos dados
+    console.log("Dados recebidos no servidor:", JSON.stringify(req.body, null, 2));
+
     // Validações iniciais
-    if (!userId || !tickets || tickets.length === 0) {
+    if (!userId || !tickets || Object.keys(tickets).length === 0) {
         return res.render('error', { erro: "Usuário ou ingressos informados incorretamente!" });
     }
 
     const transaction = await sequelize.transaction();
 
     try {
-        for (const ticket of tickets) {
-            const { ticketId, quantity } = ticket;
+        for (const ticketKey in tickets) {
+            const { id, quantity } = tickets[ticketKey];
+
+            if (!id || quantity <= 0) {
+                continue; // Ignora entradas inválidas
+            }
 
             // Verifica a quantidade no estoque
             const stock = await TicketStock.findOne({
-                where: { ticketId },
+                where: { ticketId: id },
                 transaction,
             });
 
             if (!stock || stock.quantity < quantity) {
-                throw new Error(`Estoque insuficiente para o ingresso ID ${ticketId}.`);
+                throw new Error(`Estoque insuficiente para o ingresso ID ${id}.`);
             }
 
             // Atualiza o estoque
@@ -169,13 +181,16 @@ const buyTicket = async (req, res) => {
             await stock.save({ transaction });
 
             // Registra a compra
-            await UserTicket.create({
-                userId,
-                ticketId,
-                quantity,
-                status: 'completed',
-                purchaseDate: new Date(),
-            }, { transaction });
+            await UserTicket.create(
+                {
+                    userId,
+                    ticketId: id,
+                    quantity,
+                    status: 'completed',
+                    purchaseDate: new Date(),
+                },
+                { transaction }
+            );
         }
 
         // Confirma a transação
@@ -190,6 +205,8 @@ const buyTicket = async (req, res) => {
         res.render('error', { erro: "Erro ao realizar a compra!" });
     }
 };
+
+
 
 // Função para atualizar informações de um ticket
 const updateTicket = async (req, res) => {

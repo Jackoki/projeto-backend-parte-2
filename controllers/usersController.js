@@ -119,13 +119,7 @@ const verifyUser = async (req, res) => {
         const token = jwt.sign({ id: userLogin.id, isAdm: userLogin.isAdm }, process.env.JWT_SECRET, { expiresIn: '1 hr' });
         res.cookie("token", token, { httpOnly: true });
 
-        if(userLogin.isAdm){
-            res.render('mainPageAdmin');
-        }
-
-        else{
-            res.render('mainPageUser');
-        }
+        res.render('mainPageUser');
     } 
     
     catch (error) {
