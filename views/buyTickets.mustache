@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets</title>
+</head>
+<body>
+    <h1>Tickets Disponíveis</h1>
+    <p>Total de Tickets: {{totalItems}}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome do Ticket</th>
+                <th>Quantidade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#items}}
+            <tr>
+                <td>{{name}}</td>
+                <td>{{quantity}}</td>
+            </tr>
+            {{/items}}
+        </tbody>
+    </table>
+</body>
+</html>

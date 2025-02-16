@@ -1,31 +1,32 @@
 const Ticket = require('../models/Ticket');
 const TicketStock = require('../models/TicketStock');
 const UserTicket = require('../models/UserTickets');
+const { sequelize } = require('../helpers/db');
 
 // Função para retornar todos os tickets com paginação
 const getTickets = async (req, res) => {
-    const { page = 1 } = req.query;
-    const limit = parseInt(req.query.limit, 10) || 5;
-
     try {
-        const { count, rows } = await Ticket.findAndCountAll({
-            limit: limit,
-            offset: (page - 1) * limit,
-        });
+        const tickets = await sequelize.query(
+            `SELECT t.name, ts.quantity
+            FROM db_backend_2.ticket_stock ts
+            INNER JOIN db_backend_2.tickets t ON t.id = ts.ticketId`,
 
-        const lastPage = Math.ceil(count / limit);
-        res.status(200).json({
-            items: rows,
-            currentPage: page,
-            lastPage: lastPage,
-            totalItems: count,
-        });
+            {
+                type: sequelize.QueryTypes.SELECT
+            }
+        );
+
+        // Retorna todos os tickets sem paginação
+        res.render('buyTickets', {items: tickets, totalItems: tickets.length});
     } 
     
     catch (error) {
+        console.log(error)
         res.render('error', { erro: "Erro ao consultar tickets!" });
     }
 };
+
+
 
 // Função que retorna informações de um ticket pelo nome
 const getTicketByName = async (req, res) => {

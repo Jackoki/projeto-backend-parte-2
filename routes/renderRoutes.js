@@ -23,8 +23,8 @@ router.get('/main-page-admin', verifyToken, (req, res) => {
 });
 
 // Rota para a página principal como Usuário
-router.get('/atualizar-usuario', verifyToken, isAdm, (req, res) => {
-    res.render('updateUser');
+router.get('/my-tickets', verifyToken, (req, res) => {
+    res.render('buyTickets');
 });
 
 
