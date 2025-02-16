@@ -10,13 +10,11 @@ const getTickets = async (req, res) => {
             `SELECT t.id, t.price, t.name, ts.quantity
             FROM db_backend_2.ticket_stock ts
             INNER JOIN db_backend_2.tickets t ON (t.id = ts.ticketId)`,
-
             {
                 type: sequelize.QueryTypes.SELECT
             }
         );
 
-        // Retorna todos os tickets sem paginação
         res.render('buyTickets', {items: tickets, totalItems: tickets.length});
     } 
     

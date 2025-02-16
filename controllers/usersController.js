@@ -12,20 +12,19 @@ const getUsers = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao buscar usuários!" });
+        res.status(500).json({ erro: "Erro ao consultar os usuários!" });
     }
 };
 
 //Função na tela inicial para o usuário instalar os dados padrão ao clicar no botão
 const installSystem = async (req, res) => {
     try {
-        // Verificar se o administrador já existe
         const existingAdmin = await User.findOne({
             where: { isAdm: true, email: "adm@gmail.com" }
         });
 
         if (existingAdmin) {
-            return res.render('error', { erro: "O sistema já tem o usuário Administrator!" });
+            return res.render('error', { erro: "O sistema já tem o usuário Administrator!", route: '/' });
         }
 
         const initialAdm = await User.create({
@@ -52,11 +51,11 @@ const installSystem = async (req, res) => {
 
         await TicketStock.bulkCreate(ticketStockData);
 
-        res.render('success', { message: "Compra feita com sucesso!", route: "/users/login" });
+        res.render('success', { message: "Sistema instalado com sucesso!", route: "/" });
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao realizar a instalação do sistema!" });
+        res.render('error', { erro: "Erro ao instalar o sistema!", route: '/' });
     }
 };
 
@@ -65,7 +64,7 @@ const createUser = async (req, res) => {
     const { name, email, username, password, isAdm } = req.body;
 
     if (!name || !email || !username || !password) {
-        res.render('error', { erro: "Todos os campos devem serem preenchidos!" });
+        res.render('error', { erro: "Valores não preenchidos!", route: '/register' });
     }
 
     try {
@@ -81,7 +80,7 @@ const createUser = async (req, res) => {
         });
 
         if (existingUser) {
-            return res.render('error', { erro: "Email ou Username já existentes!" });
+            res.render('error', { erro: "Email ou usuário já existentes!", route: '/register' });
         }
 
         const userCreated = await User.create({
@@ -96,8 +95,7 @@ const createUser = async (req, res) => {
     } 
     
     catch (error) {
-        console.log(error);
-        res.render('error', { erro: "Erro ao criar usuário!" });
+        res.render('error', { erro: "Erro ao realizar o registro!", route: '/' });
     }
 };
 
@@ -112,7 +110,7 @@ const verifyUser = async (req, res) => {
         });
 
         if (!userLogin) {
-            return res.render('error', { erro: "Usuário ou senha incorretas!" });
+            return res.render('error', { erro: "Informações vazias!", route: '/users/login' });
         }
 
         const token = jwt.sign({ id: userLogin.id, isAdm: userLogin.isAdm }, process.env.JWT_SECRET, { expiresIn: '1 hr' });
@@ -122,7 +120,7 @@ const verifyUser = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao fazer login!" });
+        res.render('error', { erro: "Erro ao fazer login!", route: '/users/login' });
     }
 };
 
@@ -143,7 +141,7 @@ const updateUser = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao atualizar usuário!" });
+        res.status(500).json({ erro: "Erro ao atualizar o usuário!" });
     }
 };
 
@@ -167,7 +165,7 @@ const deleteUser = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao deletar usuário!" });
+        res.status(500).json({ erro: "Erro ao deletar o usuário!" });
     }
 };
 
