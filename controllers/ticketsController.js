@@ -22,7 +22,7 @@ const getTickets = async (req, res) => {
     
     catch (error) {
         console.log(error)
-        res.render('error', { erro: "Erro ao consultar tickets!" });
+        res.render('error', { erro: "Erro ao consultar tickets!", route: '/main-page-user' });
     }
 };
 
@@ -44,7 +44,7 @@ const getTicketByName = async (req, res) => {
         );
 
         if (ticketData.length === 0) {
-            return res.render('error', { erro: "Ticket não encontrado!" });
+            return res.render('error', { erro: "Ticket não encontrado!", route: '/main-page-user' });
         }
 
         const ticket = ticketData[0];
@@ -52,7 +52,7 @@ const getTicketByName = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao consultar ticket!" });
+        res.render('error', { erro: "Erro ao consultar ticket!", route: '/main-page-user' });
     }
 };
 
@@ -62,7 +62,7 @@ const getTicketsByPrice = async (req, res) => {
     const { ticketPrice } = req.query;
 
     if (isNaN(ticketPrice)) {
-        return res.render('error', { erro: "Preço inválido!" });
+        return res.render('error', { erro: "Preço inválido!", route: '/main-page-user' });
     }
 
     try {
@@ -78,7 +78,7 @@ const getTicketsByPrice = async (req, res) => {
         );
 
         if (ticketsData.length === 0) {
-            return res.render('error', { erro: "Nenhum ticket encontrado para o preço especificado!" });
+            return res.render('error', { erro: "Nenhum ticket com o preço inserido!", route: '/main-page-user' });
         }
 
         res.render('ticketSearch', { 
@@ -88,7 +88,7 @@ const getTicketsByPrice = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao buscar tickets!" });
+        res.render('error', { erro: "Erro ao buscar o ticket!", route: '/main-page-user' });
     }
 };
 
@@ -97,7 +97,7 @@ const getUserTickets = async (req, res) => {
     const userId = req.user.id;
 
     if (!userId) {
-        return res.render('error', { erro: "Usuário não encontrado!" });
+        return res.render('error', { erro: "Usuário inválido!", route: '/' });
     }
 
     try {
@@ -115,15 +115,14 @@ const getUserTickets = async (req, res) => {
         );
 
         if (userTickets.length === 0) {
-            return res.render('error', { erro: "Nenhum ingresso encontrado para este usuário!" });
+            return res.render('error', { erro: "Nenhum ingresso encontrado!", route: '/main-page-user' });
         }
 
         return res.render('myTickets', {items: userTickets, userTickets: userTickets.length});
     } 
     
     catch (error) {
-        console.error(error);
-        res.render('error', { erro: "Erro ao buscar tickets!" });
+        res.render('error', { erro: "Erro ao buscar os tickets!", route: '/main-page-user' });
     }
 };
 
@@ -132,12 +131,12 @@ const registerTicket = async (req, res) => {
     const { name, price, quantity } = req.body;
 
     if (!name || !price || !quantity) {
-        return res.render('error', { erro: "Todos os campos são obrigatórios!" });
-    }
+        return res.status(400).json({ erro: "Todos os campos são obrigatórios!" });
+    }    
 
     if (isNaN(quantity) || quantity < 0) {
-        return res.render('error', { erro: "Quantidade inválida!" });
-    }
+        return res.status(400).json({ erro: "Quantidade inválida!" });
+    }    
 
     try {
         const newTicket = await Ticket.create({
@@ -157,7 +156,7 @@ const registerTicket = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao criar o ticket e o estoque!" });
+        return res.status(500).json({ erro: "Erro ao criar o ticket e o estoque!" });
     }
 };
 
@@ -177,10 +176,9 @@ const buyTicket = async (req, res) => {
             const { id, quantity } = tickets[ticketKey];
 
             if (!id || quantity <= 0) {
-                continue; // Ignora entradas inválidas
+                continue;
             }
 
-            // Verifica a quantidade no estoque
             const stock = await TicketStock.findOne({
                 where: { ticketId: id },
                 transaction,
@@ -190,11 +188,9 @@ const buyTicket = async (req, res) => {
                 throw new Error(`Estoque insuficiente para o ingresso ID ${id}.`);
             }
 
-            // Atualiza o estoque
             stock.quantity -= quantity;
             await stock.save({ transaction });
 
-            // Registra a compra
             await UserTicket.create(
                 {
                     userId,
@@ -207,13 +203,11 @@ const buyTicket = async (req, res) => {
             );
         }
 
-        // Confirma a transação
         await transaction.commit();
         return res.render('success', { message: "Compra feita com sucesso!", route: "/main-page-user" });
     } 
     
     catch (error) {
-        // Reverte a transação em caso de erro
         await transaction.rollback();
         res.render('error', { erro: "Erro ao realizar a compra!" });
     }
@@ -227,8 +221,8 @@ const updateTicket = async (req, res) => {
         const ticket = await Ticket.findByPk(ticketId);
 
         if (!ticket) {
-            return res.render('error', { erro: "Ticket não encontrado!" });
-        }
+            return res.status(404).json({ erro: "Ticket não encontrado!" });
+        }        
 
         const { name, price, quantity } = req.body;
 
@@ -264,7 +258,7 @@ const updateTicket = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao atualizar ticket!" });
+        return res.status(500).json({ erro: "Erro ao atualizar o estoque do ticket!" });
     }
 };
 
@@ -277,7 +271,7 @@ const deleteTicket = async (req, res) => {
         const ticket = await Ticket.findByPk(ticketId);
 
         if (!ticket) {
-            return res.render('error', { erro: "Ticket não encontrado!" });
+            return res.status(404).json({ erro: "Ticket não encontrado!" });
         }
 
         await ticket.destroy();
@@ -286,7 +280,7 @@ const deleteTicket = async (req, res) => {
     } 
     
     catch (error) {
-        res.render('error', { erro: "Erro ao deletar ticket!" });
+        return res.status(500).json({ erro: "Erro ao deletar o ticket!" });
     }
 };
 
