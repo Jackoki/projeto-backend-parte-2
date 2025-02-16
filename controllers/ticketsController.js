@@ -195,8 +195,7 @@ const buyTicket = async (req, res) => {
 
         // Confirma a transação
         await transaction.commit();
-        return res.status(200).json({ message: 'Ingressos comprados com sucesso!' });
-
+        return res.render('success', { message: "Instalação feita com sucesso!", route: "/" });
     } 
     
     catch (error) {

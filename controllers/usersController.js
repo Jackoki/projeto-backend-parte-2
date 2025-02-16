@@ -52,8 +52,7 @@ const installSystem = async (req, res) => {
 
         await TicketStock.bulkCreate(ticketStockData);
 
-        res.render('success', { message: "Instalação feita com sucesso!", route: "/" });
-
+        res.render('success', { message: "Compra feita com sucesso!", route: "/users/login" });
     } 
     
     catch (error) {

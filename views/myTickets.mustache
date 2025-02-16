@@ -1,22 +1,22 @@
-<form action="/users/login" method="GET">
-    <table>
-        <thead>
-            <tr>
-                <th>Nome do Ticket</th>
-                <th>Preço</th>
-                <th>Quantidade</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#items}}
-            <tr>
-                <td>{{name}}</td>
-                <td>{{price}}</td>
-                <td>{{quantity}}</td>
-            </tr>
-            {{/items}}
-        </tbody>
-    </table>
+<table>
+    <thead>
+         <tr>
+            <th>Nome do Ticket</th>
+            <th>Preço</th>
+            <th>Quantidade</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#items}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{price}}</td>
+            <td>{{quantity}}</td>
+        </tr>
+        {{/items}}
+    </tbody>
+</table>
 
-    <button type="submit">Voltar</button>
-</form>
+<a href="/main-page-user">
+    <button type="button">Voltar</button>
+</a>
