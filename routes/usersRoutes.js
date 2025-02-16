@@ -7,14 +7,14 @@ const usersControler = require('../controllers/usersController')
 //VerifyToken é usado para verificar o Token de Login
 //isAdm analisa se o token do usuário logado tem permissão ou não de administrador
 //userisAdmOrHimself permite ações apenas para o próprio usuário ou administradores.
-const {verifyToken, isAdm, userIsAdmOrHimself} = require('../middlewares/auth.js')
+const {verifyToken, isAdm} = require('../middlewares/auth.js')
 const router = express.Router()
 
 //Rota get do requisito para gerar um usuário administrador para utilizar no sistema
 router.get('/install', usersControler.installSystem)
 
 //Rotas get, um para retornar todos os usuários do sistema e outro para retornar um especifico pelo id no req.params
-router.get('/', usersControler.getUsers)
+router.get('/', verifyToken, isAdm, usersControler.getUsers)
 
 //Rotas post, um para registrar usuário e outro de login que retorna o token
 router.post('/registerUser', usersControler.createUser)

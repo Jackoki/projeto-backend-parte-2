@@ -3,6 +3,8 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+
 
 const { urlNotValid } = require('./middlewares/auth.js');
 const { sequelize } = require('./helpers/db');
@@ -22,6 +24,8 @@ app.use(express.json());
 // Middleware para passar informações do navegador para o back-end
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+//Middleware para salvar as informações de login e administrador no cookie
+app.use(cookieParser());
 
 // Rotas principais
 app.use('/users', usersRoutes);

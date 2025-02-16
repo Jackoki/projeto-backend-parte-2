@@ -1,30 +1,28 @@
 const jwt = require('jsonwebtoken')
+const User = require('../models/User')
 
 // Função que verifica o token pelo cabeçalho da URL
 const verifyToken = (req, res, next) => {
-    // Recebe o autenticador pelo cabeçalho usando a chave 'authorization'
-    const authHeader = req.headers['authorization'];
-
-    // Realiza a separação da string do authHeader
-    const token = authHeader && authHeader.split(' ')[1];
+    // Recebe o token pelo cookie
+    const token = req.cookies.token;
 
     // Se o token for vazio, chamará erro 401 de acesso negado
     if (!token) {
-        return res.status(401).json({ message: 'Acesso negado' });
+        return res.render('error', { erro: "Acesso negado!" });
     }
 
     // Verifica o token utilizando a chave do arquivo env
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
         if (err) {
             // Se o token não existir ou não for válido, acionará o erro 403
-            return res.status(403).json({ message: 'Token inválido!' });
+            return res.render('error', { erro: "Token inválido, logue novamente!" });
         }
 
         try {
             // Busca o usuário no banco de dados pelo ID contido no token
             const user = await User.findByPk(decoded.id);
             if (!user) {
-                return res.status(404).json({ message: 'Usuário não encontrado' });
+                return res.render('error', { erro: "Usuário não encontrado!" });
             }
 
             // Adiciona o usuário ao objeto req para uso posterior
@@ -33,7 +31,8 @@ const verifyToken = (req, res, next) => {
         } 
         
         catch (error) {
-            return res.status(500).json({ message: 'Erro ao buscar usuário' });
+            console.log(error)
+            res.render('error', { erro: "Erro ao buscar usuário no banco de dados!" });
         }
     });
 };
@@ -43,7 +42,7 @@ const verifyToken = (req, res, next) => {
 const isAdm = (req, res, next) => {
     // Verifica se o usuário é administrador
     if (!req.user.isAdm) {
-        return res.status(403).json({ message: 'Acesso negado: apenas administradores podem realizar a ação' });
+        return res.render('error', { erro: "Acesso negado: apenas administradores podem realizar a ação!" });
     }
 
     // Se o usuário for administrador, segue para a próxima função

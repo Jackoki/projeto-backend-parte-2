@@ -113,13 +113,19 @@ const verifyUser = async (req, res) => {
         });
 
         if (!userLogin) {
-            return res.status(401).json({ message: 'Usuário ou senha inválida, tente novamente' });
+            return res.render('error', { erro: "Usuário ou senha incorretas!" });
         }
 
         const token = jwt.sign({ id: userLogin.id, isAdm: userLogin.isAdm }, process.env.JWT_SECRET, { expiresIn: '1 hr' });
         res.cookie("token", token, { httpOnly: true });
 
-        res.status(200).json({ message: 'Login bem-sucedido', token });
+        if(userLogin.isAdm){
+            res.render('mainPageAdmin');
+        }
+
+        else{
+            res.render('mainPageUser');
+        }
     } 
     
     catch (error) {
